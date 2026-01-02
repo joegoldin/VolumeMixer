@@ -8,6 +8,7 @@ from src.backend.PluginManager.PluginBase import PluginBase
 import globals as gl
 from loguru import logger as log
 from fuzzywuzzy import fuzz
+import math
 
 import os
 
@@ -27,12 +28,13 @@ class Dial(ActionBase):
 
         inputs = self.plugin_base.pulse.sink_input_list()
         if index < len(inputs):
-            self.set_label(text=inputs[index].name, position="center", font_size=16)
+            self.update_labels()
         else:
             self.clear()
 
     def clear(self):
         self.set_media(image=None)
+        self.set_top_label(None)
         self.set_center_label(None)
 
     def event_callback(self, event, data):
@@ -59,8 +61,27 @@ class Dial(ActionBase):
 
             self.plugin_base.pulse.volume_set_all_chans(obj=inputs[index], vol=max(0, volume))
 
+        self.update_labels()
+
     def get_index(self) -> int:
         start_index = self.plugin_base.start_index
         own_index = int(self.input_ident.json_identifier)
         index = start_index + own_index
         return index
+
+    def update_labels(self):
+        inputs = self.plugin_base.pulse.sink_input_list()
+        index = self.get_index()
+       
+        if inputs[index].mute == 0:
+            # Display volume % if input is not muted
+            volumeLabel = str(math.ceil(inputs[index].volume.value_flat*100)) + "%"
+            labelColor = [255, 255, 255]
+        else:
+            # Display "muted" text if input is muted
+            volumeLabel = "- " + self.plugin_base.lm.get("input.muted").upper() + " -"
+            labelColor = [255, 0, 0]
+        
+        self.set_top_label(text=volumeLabel, color=labelColor, font_size=16)
+        self.set_center_label(text=inputs[index].name, font_size=18)
+        

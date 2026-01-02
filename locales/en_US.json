@@ -20,5 +20,6 @@
     "actions.move-left.name": "Move Left",
     "plugin.name": "Volume Mixer",
     "actions.hotkey.recorder.confirm-text": "Confirm",
-    "actions.hotkey.recorder.clear-text": "Clear"
+    "actions.hotkey.recorder.clear-text": "Clear",
+    "input.muted": "Muted"
 }

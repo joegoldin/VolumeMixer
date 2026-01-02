@@ -172,5 +172,5 @@ class VolumeMixer(PluginBase):
         self.original_page_path = None
         self.start_index = 0
         self.pulse = pulsectl.Pulse("stream-controller", threading_lock=True)
-        self.volume_increment = 0.1
+        self.volume_increment = 0.05
         self.volume_actions: list[ActionBase] = []

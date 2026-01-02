@@ -20,5 +20,6 @@
     "actions.move-left.name": "Nach links bewegen",
     "plugin.name": "Lautstärkemixer",
     "actions.hotkey.recorder.confirm-text": "Bestätigen",
-    "actions.hotkey.recorder.clear-text": "Zurücksetzen"
+    "actions.hotkey.recorder.clear-text": "Zurücksetzen",
+    "input.muted": "Stumm"
 }
