@@ -38,30 +38,29 @@ class Dial(ActionBase):
         self.set_center_label(None)
 
     def event_callback(self, event, data):
-        # Toggle mute
         inputs = self.plugin_base.pulse.sink_input_list()
 
         index = self.get_index()
         if index >= len(inputs):
             return
-        
+
+        name = inputs[index].name
+        volume = inputs[index].volume.value_flat
+        muted = inputs[index].mute != 0
+
         if event == Input.Dial.Events.SHORT_UP:
-            mute = inputs[index].mute == 0
-            self.plugin_base.pulse.mute(obj=inputs[index], mute=mute)
+            muted = not muted
+            self.plugin_base.pulse.mute(obj=inputs[index], mute=muted)
 
         elif event == Input.Dial.Events.TURN_CW:
-            volume = inputs[index].volume.value_flat
-            volume += self.plugin_base.volume_increment
-
-            self.plugin_base.pulse.volume_set_all_chans(obj=inputs[index], vol=min(1, volume))
+            volume = min(1, volume + self.plugin_base.volume_increment)
+            self.plugin_base.pulse.volume_set_all_chans(obj=inputs[index], vol=volume)
 
         elif event == Input.Dial.Events.TURN_CCW:
-            volume = inputs[index].volume.value_flat
-            volume -= self.plugin_base.volume_increment
+            volume = max(0, volume - self.plugin_base.volume_increment)
+            self.plugin_base.pulse.volume_set_all_chans(obj=inputs[index], vol=volume)
 
-            self.plugin_base.pulse.volume_set_all_chans(obj=inputs[index], vol=max(0, volume))
-
-        self.update_labels()
+        self.update_labels(volume=volume, muted=muted, name=name)
 
     def get_index(self) -> int:
         start_index = self.plugin_base.start_index
@@ -69,19 +68,24 @@ class Dial(ActionBase):
         index = start_index + own_index
         return index
 
-    def update_labels(self):
-        inputs = self.plugin_base.pulse.sink_input_list()
-        index = self.get_index()
-       
-        if inputs[index].mute == 0:
-            # Display volume % if input is not muted
-            volumeLabel = str(math.ceil(inputs[index].volume.value_flat*100)) + "%"
+    def update_labels(self, volume=None, muted=None, name=None):
+        if volume is None or muted is None or name is None:
+            inputs = self.plugin_base.pulse.sink_input_list()
+            index = self.get_index()
+            if volume is None:
+                volume = inputs[index].volume.value_flat
+            if muted is None:
+                muted = inputs[index].mute != 0
+            if name is None:
+                name = inputs[index].name
+
+        if not muted:
+            volumeLabel = str(math.ceil(volume * 100)) + "%"
             labelColor = [255, 255, 255]
         else:
-            # Display "muted" text if input is muted
             volumeLabel = "- " + self.plugin_base.lm.get("input.muted").upper() + " -"
             labelColor = [255, 0, 0]
-        
-        self.set_top_label(text=volumeLabel, color=labelColor, font_size=16)
-        self.set_center_label(text=inputs[index].name, font_size=18)
+
+        self.set_top_label(text=volumeLabel, color=labelColor, font_size=16, update=False)
+        self.set_center_label(text=name, font_size=18)
         
