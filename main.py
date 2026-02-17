@@ -174,3 +174,16 @@ class VolumeMixer(PluginBase):
         self.pulse = pulsectl.Pulse("stream-controller", threading_lock=True)
         self.volume_increment = 0.05
         self.volume_actions: list[ActionBase] = []
+
+    def get_all_audio_items(self) -> list:
+        """Return sinks (hardware outputs) + sink inputs (app streams) as a flat list."""
+        return self.pulse.sink_list() + self.pulse.sink_input_list()
+
+    @staticmethod
+    def get_display_name(item) -> str:
+        """Get a human-readable name for a sink or sink input."""
+        # Sinks have .description (friendly name); sink inputs just use .name
+        desc = getattr(item, "description", None)
+        if desc:
+            return desc
+        return item.name

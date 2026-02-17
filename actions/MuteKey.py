@@ -24,9 +24,9 @@ class MuteKey(ActionBase):
     def on_tick(self):
         index = self.get_index()
 
-        inputs = self.plugin_base.pulse.sink_input_list()
+        inputs = self.plugin_base.get_all_audio_items()
         if index < len(inputs):
-            self.set_label(text=inputs[index].name, position="center", font_size=10)
+            self.set_label(text=self.plugin_base.get_display_name(inputs[index]), position="center", font_size=10)
         else:
             self.clear()
 
@@ -36,7 +36,7 @@ class MuteKey(ActionBase):
 
     def on_key_down(self):
         # Toggle mute
-        inputs = self.plugin_base.pulse.sink_input_list()
+        inputs = self.plugin_base.get_all_audio_items()
 
         index = self.get_index()
         if index >= len(inputs):

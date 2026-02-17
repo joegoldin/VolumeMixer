@@ -21,7 +21,7 @@ class MoveLeft(ActionBase):
         self.current_state = -1 # Allow the first tick to update the state
 
     def on_tick(self):
-        number_of_players = len(self.plugin_base.pulse.sink_input_list())
+        number_of_players = len(self.plugin_base.get_all_audio_items())
         player_columns = self.deck_controller.deck.key_layout()[1] -1 # -1 because we want to ignore the first column containing the navigation keys
         start_index = self.plugin_base.start_index
 

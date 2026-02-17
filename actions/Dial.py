@@ -77,7 +77,7 @@ class Dial(ActionBase):
     def on_tick(self):
         index = self.get_index()
 
-        inputs = self.plugin_base.pulse.sink_input_list()
+        inputs = self.plugin_base.get_all_audio_items()
         if index < len(inputs):
             with self._lock:
                 if self._scroll_ticks_remaining > 0:
@@ -95,13 +95,13 @@ class Dial(ActionBase):
         self.set_center_label(None)
 
     def event_callback(self, event, data):
-        inputs = self.plugin_base.pulse.sink_input_list()
+        inputs = self.plugin_base.get_all_audio_items()
 
         index = self.get_index()
         if index >= len(inputs):
             return
 
-        name = inputs[index].name
+        name = self.plugin_base.get_display_name(inputs[index])
         volume = inputs[index].volume.value_flat
         muted = inputs[index].mute != 0
 
@@ -133,14 +133,14 @@ class Dial(ActionBase):
 
     def update_display(self, volume=None, muted=None, name=None):
         if volume is None or muted is None or name is None:
-            inputs = self.plugin_base.pulse.sink_input_list()
+            inputs = self.plugin_base.get_all_audio_items()
             index = self.get_index()
             if volume is None:
                 volume = inputs[index].volume.value_flat
             if muted is None:
                 muted = inputs[index].mute != 0
             if name is None:
-                name = inputs[index].name
+                name = self.plugin_base.get_display_name(inputs[index])
 
         # Build the dial image with icon + volume bar
         dial_image = self._render_dial_image(volume, muted)

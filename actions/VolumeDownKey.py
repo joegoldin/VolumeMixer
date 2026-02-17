@@ -28,7 +28,7 @@ class DownKey(ActionBase):
     def on_tick(self):
         index = self.get_index()
 
-        inputs = self.plugin_base.pulse.sink_input_list()
+        inputs = self.plugin_base.get_all_audio_items()
         if index >= len(inputs):
             self.show_state(0)
         else:
@@ -39,7 +39,7 @@ class DownKey(ActionBase):
 
     def can_go_lower(self) -> bool:
         index = self.get_index()
-        inputs = self.plugin_base.pulse.sink_input_list()
+        inputs = self.plugin_base.get_all_audio_items()
         if index >= len(inputs):
             return False
         current_vol = inputs[index].volume.value_flat
@@ -55,7 +55,7 @@ class DownKey(ActionBase):
 
     def on_key_down(self):
         # Toggle mute
-        inputs = self.plugin_base.pulse.sink_input_list()
+        inputs = self.plugin_base.get_all_audio_items()
 
         index = self.get_index()
         if index >= len(inputs):
